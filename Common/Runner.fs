@@ -5,6 +5,7 @@ open FSharpPlus
 
 type AocDay<'i> =
     { Day: int
+      Input: string option
       InputTransformer: string -> 'i
       Solutions: (string -> Unit) list }
 
@@ -32,12 +33,17 @@ module Runner =
         [<CustomOperation("day")>]
         member _.Day((), day) =
             { Day = day
+              Input = None
               InputTransformer = id
               Solutions = [ (fun _ -> ()); (fun _ -> ()) ] }
+
+        [<CustomOperation("input")>]
+        member _.Input(day, input) = { day with Input = Some input }
 
         [<CustomOperation("inputTransformer")>]
         member _.InputTransformer(day, processor) =
             { Day = day.Day
+              Input = day.Input
               InputTransformer = processor
               Solutions = day.Solutions } // Recreate because we need to change the type of AocDay
 
@@ -52,7 +58,7 @@ module Runner =
                 Solutions = day.Solutions |> setSolution 2 day.InputTransformer solution }
 
         member _.Run(day) =
-            let input = getDayInput day.Day
+            let input = day.Input |> Option.defaultValue (getDayInput day.Day)
 
             day.Solutions |> List.iter (fun part -> part input)
 
