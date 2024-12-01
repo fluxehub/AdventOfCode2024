@@ -11,7 +11,8 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="FsHttp" Version="14.5.1"/>
+        <PackageReference Include="FSharpPlus" Version="1.6.1"/>
+        <PackageReference Include="FsHttp" Version="14.5.1" PrivateAssets="compile"/>
     </ItemGroup>
 
 </Project>

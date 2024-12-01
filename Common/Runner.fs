@@ -1,6 +1,7 @@
 ﻿namespace Common
 
 open FsHttp
+open FSharpPlus
 
 type Solution<'i, 'a> = 'i -> 'a
 
@@ -36,7 +37,7 @@ module Runner =
         }
         |> Request.send
         |> Response.toString None
-        |> _.TrimEnd('\n') // Strip trailing newline
+        |> String.trimEnd "\n" // Strip trailing newline
 
     let private runSolution input solution =
         solution |> Option.map (fun solution -> solution input)

@@ -1,20 +1,20 @@
 ﻿open Common.Runner
+open FSharpPlus
 
 let splitInput (input: string) =
-    input.Split("\n")
-    |> Array.fold
+    input
+    |> String.split [ "\n" ]
+    |> Seq.fold
         (fun (leftList, rightList) line ->
-            let values = line.Split("   ")
-            let left = int values[0]
-            let right = int values[1]
-            left :: leftList, right :: rightList)
+            let values = String.split [ "   " ] line |> Seq.map int |> Seq.toList
+            values[0] :: leftList, values[1] :: rightList)
         ([], [])
 
 let findTotalDistanceSum (left, right) =
     let left = List.sort left
     let right = List.sort right
 
-    List.zip left right |> List.map (fun (a, b) -> abs (a - b)) |> List.sum
+    (left, right) ||> List.map2 (-) |> List.sumBy abs
 
 let findTotalSimilaritySum (left, right) =
     let appearances = right |> List.countBy id |> Map.ofList
