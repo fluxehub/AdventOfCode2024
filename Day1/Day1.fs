@@ -1,15 +1,6 @@
 ﻿open Common.Runner
 open FSharpPlus
 
-let splitInput (input: string) =
-    input
-    |> String.split [ "\n" ]
-    |> Seq.fold
-        (fun (leftList, rightList) line ->
-            let values = String.split [ "   " ] line |> Seq.map int |> Seq.toList
-            values[0] :: leftList, values[1] :: rightList)
-        ([], [])
-
 let findTotalDistanceSum (left, right) =
     let left = List.sort left
     let right = List.sort right
@@ -24,7 +15,16 @@ let findTotalSimilaritySum (left, right) =
 
 aoc {
     day 1
+
+    inputProcessor (fun input ->
+        input
+        |> String.split [ "\n" ]
+        |> Seq.fold
+            (fun (leftList, rightList) line ->
+                let values = String.split [ "   " ] line |> Seq.map int |> Seq.toList
+                values[0] :: leftList, values[1] :: rightList)
+            ([], []))
+
     part1 findTotalDistanceSum
     part2 findTotalSimilaritySum
 }
-|> run splitInput
