@@ -6,7 +6,7 @@ open FSharpPlus
 type AocDay<'i> =
     { Day: int
       InputTransformer: string -> 'i
-      Parts: (string -> Unit) list }
+      Solutions: (string -> Unit) list }
 
 module Runner =
     let private readSessionToken = System.IO.File.ReadAllText "session"
@@ -20,11 +20,11 @@ module Runner =
         |> Response.toString None
         |> String.trimEnd "\n" // Strip trailing newline
 
-    let private printPart part answer = printfn $"Part {part}: {answer}"
+    let private printAnswer part answer = printfn $"Part {part}: {answer}"
 
-    let private setPart inputTransformer solution part partList =
+    let private setSolution part inputTransformer solution partList =
         partList
-        |> List.setAt (part - 1) (inputTransformer >> solution >> printPart part)
+        |> List.setAt (part - 1) (inputTransformer >> solution >> printAnswer part)
 
     type AocDayBuilder() =
         member _.Yield(()) = ()
@@ -33,27 +33,27 @@ module Runner =
         member _.Day((), day) =
             { Day = day
               InputTransformer = id
-              Parts = [ (fun _ -> ()); (fun _ -> ()) ] }
+              Solutions = [ (fun _ -> ()); (fun _ -> ()) ] }
 
         [<CustomOperation("inputTransformer")>]
         member _.InputTransformer(day, processor) =
             { Day = day.Day
               InputTransformer = processor
-              Parts = day.Parts } // Recreate because we need to change the type of AocDay
+              Solutions = day.Solutions } // Recreate because we need to change the type of AocDay
 
         [<CustomOperation("part1")>]
         member _.Part1(day, solution) =
             { day with
-                Parts = day.Parts |> setPart day.InputTransformer solution 1 }
+                Solutions = day.Solutions |> setSolution 1 day.InputTransformer solution }
 
         [<CustomOperation("part2")>]
         member _.Part2(day, solution) =
             { day with
-                Parts = day.Parts |> setPart day.InputTransformer solution 2 }
+                Solutions = day.Solutions |> setSolution 2 day.InputTransformer solution }
 
         member _.Run(day) =
             let input = getDayInput day.Day
 
-            day.Parts |> List.iter (fun part -> part input)
+            day.Solutions |> List.iter (fun part -> part input)
 
     let aoc = AocDayBuilder()
