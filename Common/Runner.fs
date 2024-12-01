@@ -22,6 +22,10 @@ module Runner =
 
     let private printPart part answer = printfn $"Part {part}: {answer}"
 
+    let private setPart inputTransformer solution part partList =
+        partList
+        |> List.setAt (part - 1) (inputTransformer >> solution >> printPart part)
+
     type AocDayBuilder() =
         member _.Yield(()) = ()
 
@@ -37,12 +41,15 @@ module Runner =
               InputTransformer = processor
               Parts = day.Parts } // Recreate because we need to change the type of AocDay
 
-        [<CustomOperation("part")>]
-        member _.Part(day, part, solution) =
+        [<CustomOperation("part1")>]
+        member _.Part1(day, solution) =
             { day with
-                Parts =
-                    day.Parts
-                    |> List.setAt (part - 1) (day.InputTransformer >> solution >> printPart part) }
+                Parts = day.Parts |> setPart day.InputTransformer solution 1 }
+
+        [<CustomOperation("part2")>]
+        member _.Part2(day, solution) =
+            { day with
+                Parts = day.Parts |> setPart day.InputTransformer solution 2 }
 
         member _.Run(day) =
             let input = getDayInput day.Day

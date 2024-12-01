@@ -25,6 +25,6 @@ aoc {
                 values[0] :: leftList, values[1] :: rightList)
             ([], []))
 
-    part 1 findTotalDistanceSum
-    part 2 findTotalSimilaritySum
+    part1 findTotalDistanceSum
+    part2 findTotalSimilaritySum
 }
