@@ -7,12 +7,11 @@ type Solution<'i, 'a> = 'i -> 'a
 
 type AocDay<'i, 'a, 'b> =
     { Day: int
+      InputProcessor: (string -> 'i) option
       Part1: Solution<'i, 'a> option
-      Part2: Solution<'i, 'b> option
-      InputProcessor: (string -> 'i) option }
+      Part2: Solution<'i, 'b> option }
 
 module Runner =
-
     let private readSessionToken = System.IO.File.ReadAllText "session"
 
     let private getDayInput day =
@@ -33,20 +32,20 @@ module Runner =
         [<CustomOperation("day")>]
         member _.Day((), day) =
             { Day = day
+              InputProcessor = None
               Part1 = None
-              Part2 = None
-              InputProcessor = None }
+              Part2 = None }
+
+        [<CustomOperation("inputProcessor")>]
+        member _.InputProcessor(day, processor) =
+            { day with
+                InputProcessor = Some processor }
 
         [<CustomOperation("part1")>]
         member _.Part1(day, solution) = { day with Part1 = Some solution }
 
         [<CustomOperation("part2")>]
         member _.Part2(day, solution) = { day with Part2 = Some solution }
-
-        [<CustomOperation("inputProcessor")>]
-        member _.InputProcessor(day, processor) =
-            { day with
-                InputProcessor = Some processor }
 
         member _.Run(day) =
             if day.InputProcessor.IsNone then
