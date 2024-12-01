@@ -16,7 +16,7 @@ let findTotalSimilaritySum (left, right) =
 aoc {
     day 1
 
-    inputProcessor (fun input ->
+    inputTransformer (fun input ->
         input
         |> String.split [ "\n" ]
         |> Seq.fold

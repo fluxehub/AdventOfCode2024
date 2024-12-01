@@ -5,8 +5,8 @@ open FSharpPlus
 
 type AocDay<'i> =
     { Day: int
-      InputProcessor: string -> 'i
-      Parts: (string -> Unit) option list }
+      InputTransformer: string -> 'i
+      Parts: (string -> Unit) list }
 
 module Runner =
     let private readSessionToken = System.IO.File.ReadAllText "session"
@@ -28,23 +28,25 @@ module Runner =
         [<CustomOperation("day")>]
         member _.Day((), day) =
             { Day = day
-              InputProcessor = id
-              Parts = [ None; None ] }
+              InputTransformer = id
+              Parts = [ (fun _ -> ()); (fun _ -> ()) ] }
 
-        [<CustomOperation("inputProcessor")>]
-        member _.InputProcessor(day, processor) =
+        [<CustomOperation("inputTransformer")>]
+        member _.InputTransformer(day, processor) =
             { Day = day.Day
-              InputProcessor = processor
+              InputTransformer = processor
               Parts = day.Parts } // Recreate because we need to change the type of AocDay
 
         [<CustomOperation("part")>]
         member _.Part(day, part, solution) =
             { day with
-                Parts = [ Some(day.InputProcessor >> solution >> printPart part); day.Parts[part - 1] ] }
+                Parts =
+                    day.Parts
+                    |> List.setAt (part - 1) (day.InputTransformer >> solution >> printPart part) }
 
         member _.Run(day) =
             let input = getDayInput day.Day
 
-            day.Parts |> List.iter (Option.iter (fun part -> part input))
+            day.Parts |> List.iter (fun part -> part input)
 
     let aoc = AocDayBuilder()
