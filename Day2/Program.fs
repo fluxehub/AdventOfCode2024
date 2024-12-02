@@ -40,16 +40,13 @@ let isSafe (report: int list) =
 
     List.forall (fun v -> sign v = sign (List.head differences) && abs v > 0 && abs v <= 3) differences
 
-let countSafeReports reports =
-    reports |> List.filter isSafe |> List.length
-
 let countSafeWithDampenerBrute reports =
     reports
     |> List.filter (fun report ->
         isSafe report
-        || seq { 0 .. (List.length report) - 1 }
-           |> Seq.map (fun i -> report |> List.deleteAt i |> isSafe)
-           |> Seq.contains true)
+        || report
+           |> List.mapi (fun i _ -> report |> List.deleteAt i |> isSafe)
+           |> List.contains true)
     |> List.length
 
 aoc {
@@ -61,6 +58,6 @@ aoc {
         |> Seq.map (String.split [ " " ] >> Seq.map int >> Seq.toList)
         |> Seq.toList)
 
-    part1 countSafeReports
+    part1 (List.filter isSafe >> List.length)
     part2 countSafeWithDampenerBrute
 }
