@@ -1,7 +1,7 @@
 ﻿open Common.Runner
 open FSharpPlus
 
-let safePredicate differences =
+let isSafe differences =
     List.forall (fun v -> sign v = sign (List.head differences) && abs v > 0 && abs v <= 3) differences
 
 let removeRecord index differences =
@@ -18,20 +18,20 @@ let canRemove differences predicate =
     let matches = differences |> List.map predicate
     let firstUnsafe = List.findIndex not matches
 
-    safePredicate (removeRecord firstUnsafe differences)
-    || safePredicate (removeRecord (firstUnsafe + 1) differences)
+    isSafe (removeRecord firstUnsafe differences)
+    || isSafe (removeRecord (firstUnsafe + 1) differences)
 
 let countSafeReports reports =
     reports
     |> List.map (fun report -> List.map2 (-) (List.take (List.length report - 1) report) (List.tail report))
-    |> List.filter safePredicate
+    |> List.filter isSafe
     |> List.length
 
 let countSafeWithDampener reports =
     reports
     |> List.map (fun report -> List.map2 (-) (List.take (List.length report - 1) report) (List.tail report))
     |> List.filter (fun d ->
-        safePredicate d
+        isSafe d
         || canRemove d (fun x -> -3 <= x && x < 0) // Can't reuse predicate because of edge case
         || canRemove d (fun x -> 0 < x && x <= 3))
     |> List.length
