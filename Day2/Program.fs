@@ -24,19 +24,13 @@ let canRemove differences predicate =
 
 let countSafeReports reports =
     reports
-    |> List.map (fun report ->
-        (List.head report, List.tail report)
-        ||> List.mapFold (fun last level -> level - last, level)
-        |> fst)
+    |> List.map (fun report -> List.map2 (-) (List.take (List.length report - 1) report) (List.tail report))
     |> List.filter safePredicate
     |> List.length
 
 let countSafeWithDampener reports =
     reports
-    |> List.map (fun report ->
-        (List.head report, List.tail report)
-        ||> List.mapFold (fun last level -> level - last, level)
-        |> fst)
+    |> List.map (fun report -> List.map2 (-) (List.take (List.length report - 1) report) (List.tail report))
     |> List.filter (fun d ->
         safePredicate d
         || canRemove d (fun x -> -3 <= x && x < 0)
