@@ -27,7 +27,7 @@ let countXmasInLine l =
     let regex = Regex("XMAS", RegexOptions.Compiled) // The simplest regex you've ever seen
     String.ofSeq l |> regex.Matches |> _.Count
 
-let rec countAllXmas grid=
+let rec countAllXmas grid =
     let rec loop rotation grid =
         if rotation = 360 then
             0
