@@ -2,11 +2,12 @@
 
 open FsHttp
 open FSharpPlus
+open Microsoft.FSharp.Core
 
 type AocDay<'i> =
     { Day: int
       Input: string option
-      InputTransformer: string -> 'i
+      InputMapper: string -> 'i
       Solutions: (string -> Unit) list }
 
 module Runner =
@@ -23,9 +24,8 @@ module Runner =
 
     let private printAnswer part answer = printfn $"Part {part}: {answer}"
 
-    let private setSolution part inputTransformer solution partList =
-        partList
-        |> List.setAt (part - 1) (inputTransformer >> solution >> printAnswer part)
+    let private setSolution part inputMapper solution partList =
+        partList |> List.setAt (part - 1) (inputMapper >> solution >> printAnswer part)
 
     type AocDayBuilder() =
         member _.Yield(()) = ()
@@ -34,28 +34,48 @@ module Runner =
         member _.Day((), day) =
             { Day = day
               Input = None
-              InputTransformer = id
+              InputMapper = id
               Solutions = [ (fun _ -> ()); (fun _ -> ()) ] }
 
         [<CustomOperation("input")>]
         member _.Input(day, input) = { day with Input = Some input }
 
-        [<CustomOperation("inputTransformer")>]
-        member _.InputTransformer(day, processor) =
+        [<CustomOperation("mapInput")>]
+        member _.InputMapper(day, mapper) =
             { Day = day.Day
               Input = day.Input
-              InputTransformer = processor
+              InputMapper = mapper
+              Solutions = day.Solutions } // Recreate because we need to change the type of AocDay
+
+        [<CustomOperation("mapLine")>]
+        member _.LineMapper(day, mapper) =
+            let inputMapper input =
+                input |> String.split [ "\n" ] |> Seq.map mapper |> Seq.toList
+
+            { Day = day.Day
+              Input = day.Input
+              InputMapper = inputMapper
+              Solutions = day.Solutions } // Recreate because we need to change the type of AocDay
+
+        [<CustomOperation("mapLines")>]
+        member _.LinesMapper(day, mapper) =
+            let inputMapper input =
+                input |> String.split [ "\n" ] |> Seq.toList |> mapper
+
+            { Day = day.Day
+              Input = day.Input
+              InputMapper = inputMapper
               Solutions = day.Solutions } // Recreate because we need to change the type of AocDay
 
         [<CustomOperation("part1")>]
         member _.Part1(day, solution) =
             { day with
-                Solutions = day.Solutions |> setSolution 1 day.InputTransformer solution }
+                Solutions = day.Solutions |> setSolution 1 day.InputMapper solution }
 
         [<CustomOperation("part2")>]
         member _.Part2(day, solution) =
             { day with
-                Solutions = day.Solutions |> setSolution 2 day.InputTransformer solution }
+                Solutions = day.Solutions |> setSolution 2 day.InputMapper solution }
 
         member _.Run(day) =
             let input = day.Input |> Option.defaultValue (getDayInput day.Day)

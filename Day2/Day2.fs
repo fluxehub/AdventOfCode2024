@@ -52,11 +52,7 @@ let countSafeWithDampenerBrute reports =
 aoc {
     day 2
 
-    inputTransformer (fun input ->
-        input
-        |> String.split [ "\n" ]
-        |> Seq.map (String.split [ " " ] >> Seq.map int >> Seq.toList)
-        |> Seq.toList)
+    mapLine (String.split [ " " ] >> Seq.map int >> Seq.toList)
 
     part1 (List.filter isSafe >> List.length)
     part2 countSafeWithDampenerBrute

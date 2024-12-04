@@ -16,14 +16,13 @@ let findTotalSimilaritySum (left, right) =
 aoc {
     day 1
 
-    inputTransformer (fun input ->
-        input
-        |> String.split [ "\n" ]
-        |> Seq.fold
+    mapLines (
+        Seq.fold
             (fun (leftList, rightList) line ->
                 let values = String.split [ "   " ] line |> Seq.map int |> Seq.toList
                 values[0] :: leftList, values[1] :: rightList)
-            ([], []))
+            ([], [])
+    )
 
     part1 findTotalDistanceSum
     part2 findTotalSimilaritySum
