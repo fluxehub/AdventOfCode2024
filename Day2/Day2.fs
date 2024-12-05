@@ -1,5 +1,4 @@
-﻿open Common.Runner
-open FSharpPlus
+﻿open Common
 
 // I originally found a smart non-brute force method but I don't like the code
 // Keeping it here anyway because solving it this way caused me great pain
@@ -35,24 +34,23 @@ open FSharpPlus
 //     |> List.length
 
 let isSafe (report: int list) =
-    let differences =
-        List.map2 (-) (List.take (List.length report - 1) report) (List.tail report)
+    let differences = Seq.map2 (-) report (List.tail report)
 
-    List.forall (fun v -> sign v = sign (List.head differences) && abs v > 0 && abs v <= 3) differences
+    Seq.forall (fun v -> sign v = sign (Seq.head differences) && abs v > 0 && abs v <= 3) differences
 
 let countSafeWithDampenerBrute reports =
     reports
     |> List.filter (fun report ->
         isSafe report
         || report
-           |> List.mapi (fun i _ -> report |> List.deleteAt i |> isSafe)
+           |> List.mapi (fun i _ -> report |> List.removeAt i |> isSafe)
            |> List.contains true)
     |> List.length
 
 aoc {
     day 2
 
-    mapLine (String.split [ " " ] >> Seq.map int >> Seq.toList)
+    mapLine (String.splitList " " >> List.map int)
 
     part1 (List.filter isSafe >> List.length)
     part2 countSafeWithDampenerBrute

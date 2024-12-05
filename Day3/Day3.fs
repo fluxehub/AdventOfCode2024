@@ -1,5 +1,5 @@
 ﻿open System.Text.RegularExpressions
-open Common.Runner
+open Common
 open FSharpPlus
 
 let sumOfMul input =

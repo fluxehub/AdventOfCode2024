@@ -1,5 +1,5 @@
 ﻿open System.Text.RegularExpressions
-open Common.Runner
+open Common
 open FSharpPlus
 
 // This solution is tenuously functional
@@ -12,11 +12,11 @@ let rows m =
     let h, w = Array2D.length1 m, Array2D.length2 m
 
     // If it's in a list comprehension it's functional right ?
-    [ for k in 0..h - 1 -> [ for j in 0..w - 1 -> m[k, j] ] ]
+    [ for k in 0 .. h - 1 -> [ for j in 0 .. w - 1 -> m[k, j] ] ]
 
 let diagonals m =
     let h, w = Array2D.length1 m, Array2D.length2 m
-    
+
     // Yep!
     [ for k in 0 .. (h + w - 2) ->
           [ for j in 0..k do
@@ -35,7 +35,7 @@ let rec countAllXmas grid =
             let rowCount = grid |> rows |> List.sumBy countXmasInLine
             let diagCount = grid |> diagonals |> List.sumBy countXmasInLine
             rowCount + diagCount + loop (rotation + 90) (rotate90 grid)
-     
+
     loop 0 grid
 
 let aCrosses m =
@@ -55,13 +55,16 @@ let aCrosses m =
     }
 
 let countAllCrossMas grid =
-    grid |> aCrosses |> Seq.filter (fun (l, r) -> (l = "SAM" || l = "MAS") && (r = "SAM" || r = "MAS")) |> Seq.length
-     
+    grid
+    |> aCrosses
+    |> Seq.filter (fun (l, r) -> (l = "SAM" || l = "MAS") && (r = "SAM" || r = "MAS"))
+    |> Seq.length
+
 aoc {
     day 4
-    
-    mapLines (Seq.map String.toList >> Seq.toList >> array2D)
-    
+
+    mapLines (List.map String.toList >> array2D)
+
     part1 countAllXmas
     part2 countAllCrossMas
 }

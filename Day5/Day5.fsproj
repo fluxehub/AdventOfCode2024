@@ -13,8 +13,4 @@
         <ProjectReference Include="..\Common\Common.fsproj"/>
     </ItemGroup>
 
-    <ItemGroup>
-        <PackageReference Include="FSharp.FGL" Version="0.0.4"/>
-    </ItemGroup>
-
 </Project>

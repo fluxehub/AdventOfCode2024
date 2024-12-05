@@ -10,6 +10,12 @@ type AocDay<'i> =
       InputMapper: string -> 'i
       Solutions: (string -> Unit) list }
 
+module String =
+    // Returns a list, not a seq
+    let splitList separator =
+        String.split [ separator ] >> Seq.toList
+
+[<AutoOpen>]
 module Runner =
     let private readSessionToken = System.IO.File.ReadAllText "session"
 
@@ -25,7 +31,8 @@ module Runner =
     let private printAnswer part answer = printfn $"Part {part}: {answer}"
 
     let private setSolution part inputMapper solution partList =
-        partList |> List.setAt (part - 1) (inputMapper >> solution >> printAnswer part)
+        partList
+        |> List.updateAt (part - 1) (inputMapper >> solution >> printAnswer part)
 
     type AocDayBuilder() =
         member _.Yield(()) = ()
@@ -50,7 +57,7 @@ module Runner =
         [<CustomOperation("mapLine")>]
         member _.LineMapper(day, mapper) =
             let inputMapper input =
-                input |> String.split [ "\n" ] |> Seq.map mapper |> Seq.toList
+                input |> String.splitList "\n" |> List.map mapper
 
             { Day = day.Day
               Input = day.Input
@@ -60,7 +67,7 @@ module Runner =
         [<CustomOperation("mapLines")>]
         member _.LinesMapper(day, mapper) =
             let inputMapper input =
-                input |> String.split [ "\n" ] |> Seq.toList |> mapper
+                input |> String.splitList "\n" |> mapper
 
             { Day = day.Day
               Input = day.Input

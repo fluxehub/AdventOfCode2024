@@ -1,50 +1,35 @@
 ﻿#nowarn 0025
 
-open Common.Runner
-open FSharp.FGL
-open FSharpPlus
-
-let buildGraph edges =
-    // Have to append unused labels to make the library happy
-    let vertices =
-        edges |> List.unzip ||> (@) |> List.distinct |> List.map (fun v -> v, ())
-
-    Graph.empty
-    |> Vertices.addMany vertices
-    |> Directed.Edges.addMany (edges |> List.map (fun (a, b) -> a, b, ()))
+open Common
 
 let isSortedWith compare l = List.sortWith compare l = l
 
-let compareEdge graph a b =
-    if graph |> Directed.Edges.contains a b then -1 else 1
+let compareEdge edgeSet a b =
+    if edgeSet |> Set.contains (a, b) then -1 else 1
+
+let center l = l |> List.item (List.length l / 2)
 
 aoc {
     day 5
 
     mapInput (fun input ->
         let [ edges; paths ] =
-            input
-            |> String.split [ "\n\n" ]
-            |> Seq.map (String.split [ "\n" ] >> List.ofSeq)
-            |> List.ofSeq
+            input |> String.splitList "\n\n" |> List.map (String.splitList "\n")
 
-        let graph =
+        let edgeSet =
             edges
-            |> List.map (String.split [ "|" ] >> List.ofSeq >> (fun [ a; b ] -> int a, int b))
-            |> buildGraph
+            |> List.map (String.splitList "|" >> (fun [ a; b ] -> int a, int b))
+            |> Set.ofList
 
-        let paths = paths |> List.map (String.split [ "," ] >> List.ofSeq >> List.map int)
+        let paths = paths |> List.map (String.splitList "," >> List.map int)
 
-        graph, paths)
+        edgeSet, paths)
 
-    part1 (fun (g, p) ->
+    part1 (fun (es, p) -> p |> List.filter (isSortedWith (compareEdge es)) |> List.sumBy center)
+
+    part2 (fun (es, p) ->
         p
-        |> List.filter (isSortedWith (compareEdge g))
-        |> List.sumBy (fun l -> l[List.length l / 2]))
-
-    part2 (fun (g, p) ->
-        p
-        |> List.filter (isSortedWith (compareEdge g) >> not)
-        |> List.map (List.sortWith (compareEdge g))
-        |> List.sumBy (fun l -> l[List.length l / 2]))
+        |> List.filter (isSortedWith (compareEdge es) >> not)
+        |> List.map (List.sortWith (compareEdge es))
+        |> List.sumBy center)
 }

@@ -1,8 +1,7 @@
 ﻿#nowarn 0025
 
-open Common.Runner
-open FSharpPlus
-        
+open Common
+
 let findTotalDistanceSum (left, right) =
     (List.sort left, List.sort right) ||> List.map2 (-) |> List.sumBy abs
 
@@ -15,7 +14,7 @@ let findTotalSimilaritySum (left, right) =
 aoc {
     day 1
 
-    mapLines (List.map (String.split [ "   " ] >> Seq.toList >> fun [ l; r ] -> int l, int r) >> List.unzip)
+    mapLines (List.map (String.splitList "   " >> fun [ l; r ] -> int l, int r) >> List.unzip)
 
     part1 findTotalDistanceSum
     part2 findTotalSimilaritySum
