@@ -13,22 +13,11 @@ let buildGraph edges =
     |> Vertices.addMany vertices
     |> Directed.Edges.addMany (edges |> List.map (fun (a, b) -> a, b, ()))
 
-let buildPath vertices =
-    (vertices |> List.take (List.length vertices - 1), List.tail vertices)
-    ||> List.zip
-
-let isPathValid graph path =
-    path |> List.forall (fun (a, b) -> Directed.Edges.contains a b graph)
-
-let sumPathCenters =
-    List.map (fun l -> l |> List.map fst |> List.item (List.length l / 2)) >> List.sum
+let isSortedWith compare l = List.sortWith compare l = l
 
 let compareEdge graph a b =
-    if graph |> Directed.Edges.contains a b then
-        -1
-    else
-        1
-    
+    if graph |> Directed.Edges.contains a b then -1 else 1
+
 aoc {
     day 5
 
@@ -45,20 +34,17 @@ aoc {
             |> buildGraph
 
         let paths = paths |> List.map (String.split [ "," ] >> List.ofSeq >> List.map int)
-        
-        let pathEdges = List.map buildPath paths
-        
-        graph, paths, pathEdges)
 
-    part1 (fun (g, _, p) ->
+        graph, paths)
+
+    part1 (fun (g, p) ->
         p
-        |> List.filter (isPathValid g)
-        |> sumPathCenters)
-    
-    part2 (fun (g, p, pe) ->
-        List.zip p pe
-        |> List.filter (fun (_, pe) -> isPathValid g pe |> not)
-        |> List.map fst
+        |> List.filter (isSortedWith (compareEdge g))
+        |> List.sumBy (fun l -> l[List.length l / 2]))
+
+    part2 (fun (g, p) ->
+        p
+        |> List.filter (isSortedWith (compareEdge g) >> not)
         |> List.map (List.sortWith (compareEdge g))
-        |> List.sumBy (fun l -> l[l.Length / 2]))
+        |> List.sumBy (fun l -> l[List.length l / 2]))
 }
