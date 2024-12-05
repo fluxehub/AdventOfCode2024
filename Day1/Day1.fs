@@ -4,10 +4,7 @@ open Common.Runner
 open FSharpPlus
         
 let findTotalDistanceSum (left, right) =
-    let left = List.sort left
-    let right = List.sort right
-
-    (left, right) ||> List.map2 (-) |> List.sumBy abs
+    (List.sort left, List.sort right) ||> List.map2 (-) |> List.sumBy abs
 
 let findTotalSimilaritySum (left, right) =
     let appearances = right |> List.countBy id |> Map.ofList
