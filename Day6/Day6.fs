@@ -1,5 +1,4 @@
-﻿open System.Diagnostics
-open Common
+﻿open Common
 open FSharpPlus
 
 type Guard =
@@ -33,37 +32,28 @@ module Guard =
 type State =
     { Map: char array2d
       Guard: Guard
-      Visited: Set<int * int> }
+      Visited: Set<Guard> }
 
 module State =
-    let private tryStep state =
+    let rec tryStep state =
         match state.Guard |> Guard.tryMove state.Map with
-        | None -> None
+        | None -> None, false
         | Some guard ->
-            Some
-                { state with
-                    Guard = guard
-                    Visited = state.Visited |> Set.add guard.Position }
+            if state.Visited |> Set.contains guard then
+                Some state, true
+            else
+                Some
+                    { state with
+                        Guard = guard
+                        Visited = state.Visited |> Set.add guard },
+                false
 
     let run state =
         let rec loop state =
             match tryStep state with
-            | None -> state
-            | Some state -> loop state
-
-        loop state
-
-    let isLoop state =
-        // This solution is done purely because it is the funniest way to solve the problem
-        let stopwatch = Stopwatch.StartNew()
-
-        let rec loop state =
-            if stopwatch.ElapsedMilliseconds > 1000 then // Works on my machine
-                true
-            else
-                match tryStep state with
-                | None -> false
-                | Some state -> loop state
+            | None, _ -> state, false
+            | Some state, true -> state, true
+            | Some state, false -> loop state
 
         loop state
 
@@ -75,33 +65,31 @@ let findGuardPosition inputMap =
 
     loop inputMap 0
 
+let findVisitedPositions = State.run >> fst >> _.Visited >> Set.map _.Position
+
 aoc {
     day 6
 
     mapLines (fun lines ->
-        let guardPosition = findGuardPosition lines
+        let guard =
+            { Character = '^'
+              Position = findGuardPosition lines }
 
         { Map = lines |> List.map String.toList |> array2D
-          Guard =
-            { Character = '^'
-              Position = guardPosition }
-          Visited = set [ guardPosition ] })
+          Guard = guard
+          Visited = set [ guard ] })
 
-    part1 (fun state -> state |> State.run |> _.Visited |> Set.count)
+    part1 (findVisitedPositions >> Set.count)
 
     part2 (fun state ->
-        let w, h = Array2D.length1 state.Map, Array2D.length2 state.Map
-
-        let positionsToTry =
-            [ for x in 0 .. w - 1 do
-                  yield! [ for y in 0 .. h - 1 -> x, y ] ]
-            |> List.filter ((<>) state.Guard.Position)
-            |> Array.ofList
-
-        positionsToTry
-        |> Array.Parallel.filter (fun (x, y) ->
-            let newMap = Array2D.copy state.Map
-            newMap[y, x] <- '#'
-            State.isLoop { state with Map = newMap })
-        |> Array.length)
+        state
+        |> findVisitedPositions
+        |> Set.toList
+        |> List.filter (fun (x, y) -> state.Map[y, x] = '.')
+        |> List.filter (fun (x, y) ->
+            state.Map[y, x] <- '#'
+            let _, isLoop = State.run state
+            state.Map[y, x] <- '.'
+            isLoop)
+        |> List.length)
 }

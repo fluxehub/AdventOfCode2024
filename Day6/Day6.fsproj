@@ -6,6 +6,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <Compile Include="Day6_LoopTimeMonitor.fs"/>
         <Compile Include="Day6.fs"/>
     </ItemGroup>
 
