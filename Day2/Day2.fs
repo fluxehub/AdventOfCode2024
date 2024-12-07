@@ -1,4 +1,6 @@
-﻿open Common
+﻿#nowarn 0025
+
+open Common
 
 // I originally found a smart non-brute force method but I don't like the code
 // Keeping it here anyway because solving it this way caused me great pain
@@ -34,9 +36,9 @@
 //     |> List.length
 
 let isSafe (report: int list) =
-    let differences = Seq.map2 (-) report (List.tail report)
+    let differences = List.windowed 2 report |> List.map (fun [ a; b ] -> b - a)
 
-    Seq.forall (fun v -> sign v = sign (Seq.head differences) && abs v > 0 && abs v <= 3) differences
+    List.forall (fun v -> sign v = sign (List.head differences) && abs v > 0 && abs v <= 3) differences
 
 let countSafeWithDampenerBrute reports =
     reports
