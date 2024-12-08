@@ -1,6 +1,4 @@
-﻿#nowarn 0025
-
-open Common
+﻿open Common
 
 // I originally found a smart non-brute force method but I don't like the code
 // Keeping it here anyway because solving it this way caused me great pain
@@ -36,7 +34,7 @@ open Common
 //     |> List.length
 
 let isSafe (report: int list) =
-    let differences = List.windowed 2 report |> List.map (fun [ a; b ] -> b - a)
+    let differences = List.pairwise report |> List.map (fun (a, b) -> b - a)
 
     List.forall (fun v -> sign v = sign (List.head differences) && abs v > 0 && abs v <= 3) differences
 
