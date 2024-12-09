@@ -78,8 +78,6 @@ let compactPart2 disk =
 aoc {
     day 9
 
-    // input "2333133121414131402"
-
     mapInput (fun input ->
         let rec buildFileSystem (i, acc) layout =
             match layout with
