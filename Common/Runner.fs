@@ -1,5 +1,6 @@
 ﻿namespace Common
 
+open System.IO
 open FsHttp
 open FSharpPlus
 open Microsoft.FSharp.Core
@@ -19,7 +20,7 @@ module String =
 module Runner =
     let private readSessionToken = System.IO.File.ReadAllText "session"
 
-    let private getDayInput day =
+    let private downloadDayInput day =
         http {
             GET $"https://adventofcode.com/2024/day/{day}/input"
             Cookie "session" readSessionToken
@@ -27,6 +28,15 @@ module Runner =
         |> Request.send
         |> Response.toString None
         |> String.trimEnd "\n" // Strip trailing newline
+
+    let private getDayInput day =
+        // Read input file exists, otherwise download it
+        if File.Exists $"day{day}.txt" then
+            File.ReadAllText $"day{day}.txt"
+        else
+            let input = downloadDayInput day
+            File.WriteAllText($"day{day}.txt", input)
+            input
 
     let private printAnswer part answer = printfn $"Part {part}: {answer}"
 
