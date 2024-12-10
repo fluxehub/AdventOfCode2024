@@ -10,8 +10,8 @@ let getAdjacentPoints (x, y, v) map =
         && y < Array2D.length2 map
         && map[y, x] - 1 = v)
 
-let scoreTrailhead (px, py) (map: int array2d) =
-    let rec search toVisit (map: int array2d) (visited: (int * int) Set) =
+let scoreTrailhead (px, py) map =
+    let rec search toVisit (map: int array2d) visited =
         match toVisit with
         | [] -> visited
         | (px, py) :: rest when (map[py, px] = 9) -> search rest map (visited |> Set.add (px, py))
@@ -22,8 +22,8 @@ let scoreTrailhead (px, py) (map: int array2d) =
 
     search [ (px, py) ] map Set.empty
 
-let rateTrailhead (px, py) (map: int array2d) =
-    let rec search toVisit (map: int array2d) currentPath (paths: (int * int) list Set) =
+let rateTrailhead (px, py) map =
+    let rec search toVisit (map: int array2d) currentPath paths =
         match toVisit with
         | [] -> paths
         | (px, py) :: rest when (map[py, px] = 9) ->
