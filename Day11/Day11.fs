@@ -9,7 +9,7 @@ module Stones =
         let d = pown 10UL at
         (n / d, n % d)
 
-    let private addToCount stone count (Stones stones) =
+    let private addStones stone count (Stones stones) =
         Stones(stones |> Map.change stone (Option.defaultValue 0UL >> (+) count >> Some))
 
     let ofList =
@@ -24,11 +24,11 @@ module Stones =
             | [] -> newStones
             | (stone, count) :: rest ->
                 match (stone, digitLength stone) with
-                | 0UL, _ -> buildNewStones (newStones |> addToCount 1UL count) rest
+                | 0UL, _ -> buildNewStones (newStones |> addStones 1UL count) rest
                 | s, l when l % 2 = 0 ->
                     let s1, s2 = split (l / 2) s
-                    buildNewStones (newStones |> addToCount s1 count |> addToCount s2 count) rest
-                | s, _ -> buildNewStones (newStones |> addToCount (s * 2024UL) count) rest
+                    buildNewStones (newStones |> addStones s1 count |> addStones s2 count) rest
+                | s, _ -> buildNewStones (newStones |> addStones (s * 2024UL) count) rest
 
         buildNewStones (Stones Map.empty) (Map.toList stones)
 
