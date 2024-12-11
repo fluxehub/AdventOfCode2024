@@ -3,15 +3,14 @@
 type Stones = Stones of Map<uint64, uint64>
 
 module Stones =
-    let private digitLength n = int (floor (log10 (float n)) + 1.0)
+    let private digitLength n = n |> float |> log10 |> int |> (+) 1
 
     let private split at n =
         let d = pown 10UL at
         (n / d, n % d)
 
     let private addToCount stone count (Stones stones) =
-        let current = stones |> Map.tryFind stone |> Option.defaultValue 0UL
-        Stones(stones |> Map.add stone (current + count))
+        Stones(stones |> Map.change stone (Option.defaultValue 0UL >> (+) count >> Some))
 
     let ofList =
         List.countBy id
