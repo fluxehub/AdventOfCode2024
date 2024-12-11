@@ -1,4 +1,4 @@
-﻿module Day6_LoopTimeMonitor
+﻿module Day06_LoopTimeMonitor
 
 open System.Diagnostics
 open Common
