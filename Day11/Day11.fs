@@ -12,9 +12,6 @@ module Stones =
     let private addStones stone count (Stones stones) =
         Stones(stones |> Map.change stone (Option.defaultValue 0UL >> (+) count >> Some))
 
-    let ofList =
-        List.countBy id >> List.map (fun (k, v) -> k, uint64 v) >> Map.ofList >> Stones
-
     let private (|Zero|_|) (stone, count) =
         if stone = 0UL then Some(count) else None
 
@@ -23,6 +20,9 @@ module Stones =
         if l % 2 = 0 then Some(stone, l, count) else None
 
     let private (|Stone|) (stone, count) = stone, count
+
+    let ofList =
+        List.countBy id >> List.map (fun (k, v) -> k, uint64 v) >> Map.ofList >> Stones
 
     let blink (Stones stones) =
         let rec buildNewStones newStones stones =
@@ -42,8 +42,7 @@ let rec runBlinks count stones =
     if count = 0 then
         stones
     else
-        let newStones = Stones.blink stones
-        runBlinks (count - 1) newStones
+        Stones.blink stones |> runBlinks (count - 1)
 
 aoc {
     day 11
