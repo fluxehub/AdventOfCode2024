@@ -13,22 +13,26 @@ module Stones =
         Stones(stones |> Map.change stone (Option.defaultValue 0UL >> (+) count >> Some))
 
     let ofList =
-        List.countBy id
-        >> List.map (fun (k, v) -> uint64 k, uint64 v)
-        >> Map.ofList
-        >> Stones
+        List.countBy id >> List.map (fun (k, v) -> k, uint64 v) >> Map.ofList >> Stones
+
+    let private (|Zero|_|) (stone, count) =
+        if stone = 0UL then Some(count) else None
+
+    let private (|EvenDigits|_|) (stone, count) =
+        let l = digitLength stone
+        if l % 2 = 0 then Some(stone, l, count) else None
+
+    let private (|Stone|) (stone, count) = stone, count
 
     let blink (Stones stones) =
         let rec buildNewStones newStones stones =
             match stones with
             | [] -> newStones
-            | (stone, count) :: rest ->
-                match (stone, digitLength stone) with
-                | 0UL, _ -> buildNewStones (newStones |> addStones 1UL count) rest
-                | s, l when l % 2 = 0 ->
-                    let s1, s2 = split (l / 2) s
-                    buildNewStones (newStones |> addStones s1 count |> addStones s2 count) rest
-                | s, _ -> buildNewStones (newStones |> addStones (s * 2024UL) count) rest
+            | Zero count :: rest -> buildNewStones (newStones |> addStones 1UL count) rest
+            | EvenDigits(stone, l, count) :: rest ->
+                let s1, s2 = split (l / 2) stone
+                buildNewStones (newStones |> addStones s1 count |> addStones s2 count) rest
+            | Stone(stone, count) :: rest -> buildNewStones (newStones |> addStones (stone * 2024UL) count) rest
 
         buildNewStones (Stones Map.empty) (Map.toList stones)
 
