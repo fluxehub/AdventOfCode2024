@@ -7,7 +7,6 @@ module Stones =
 
     let private split at n =
         let d = pown 10UL at
-
         (n / d, n % d)
 
     let private addToCount stone count (Stones stones) =
