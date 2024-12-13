@@ -3,12 +3,7 @@ open FSharpPlus
 
 let getAdjacentPoints (x, y, v) map =
     [ (x - 1, y); (x + 1, y); (x, y - 1); (x, y + 1) ]
-    |> List.filter (fun (x, y) ->
-        x >= 0
-        && y >= 0
-        && x < Array2D.length1 map
-        && y < Array2D.length2 map
-        && map[y, x] - 1 = v)
+    |> List.filter (fun (x, y) -> Array2D.isInsideBounds (x, y) map && map[y, x] - 1 = v)
 
 let scoreTrailhead (px, py) map =
     let rec search toVisit (map: int array2d) visited =

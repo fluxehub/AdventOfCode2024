@@ -6,6 +6,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <Compile Include="Helpers.fs"/>
         <Compile Include="Runner.fs"/>
         <None Include="session" CopyToOutputDirectory="PreserveNewest"/>
     </ItemGroup>

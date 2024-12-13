@@ -11,11 +11,6 @@ type AocDay<'i> =
       InputMapper: string -> 'i
       Solutions: (string -> Unit) list }
 
-module String =
-    // Returns a list, not a seq
-    let splitList separator =
-        String.split [ separator ] >> Seq.toList
-
 [<AutoOpen>]
 module Runner =
     let private readSessionToken = System.IO.File.ReadAllText "session"
