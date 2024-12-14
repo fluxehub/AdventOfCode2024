@@ -90,7 +90,10 @@ module Runner =
                 Solutions = day.Solutions |> setSolution 2 day.InputMapper solution }
 
         member _.Run(day) =
-            let input = day.Input |> Option.defaultValue (getDayInput day.Day)
+            let input =
+                match day.Input with
+                | Some input -> input
+                | None -> getDayInput day.Day
 
             day.Solutions |> List.iter (fun part -> part input)
 

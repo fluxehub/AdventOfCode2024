@@ -10,14 +10,14 @@ module String =
 
 // We do this so much this year
 module Array2D =
-    let isInsideBounds (x, y) array =
-        x >= 0 && x < Array2D.length1 array && y >= 0 && y < Array2D.length2 array
+    let isInBounds (x, y) array =
+        x >= 0 && x < Array2D.length2 array && y >= 0 && y < Array2D.length1 array
 
     let foldi folder state array =
-        let w, h = Array2D.length1 array, Array2D.length2 array
+        let w, h = Array2D.length2 array, Array2D.length1 array
 
         let rec loop x y state =
-            if y = 0 then
+            if y = h then
                 state
             else
                 let state = folder x y array[y, x] state
